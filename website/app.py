@@ -42,11 +42,6 @@ def img(imdbID):
     conn.close()
     return Response(req, content_type=req.headers['content-type'])
 
-@app.route('/sitemap.xml')
-def sitemap():
-    conn = sqlite3.connect(db_file)
-    return Response(imdb('tt1839578', conn).sitemap(request.url_root), mimetype='application/xml')
-
 @app.route('/favicon.ico')
 def favicon():
     return errors, 500

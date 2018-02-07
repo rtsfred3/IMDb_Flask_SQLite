@@ -1,105 +1,40 @@
-#Gets and Parses data from IMDb's unofficial API and
-#presents data as part of a class
+#Gets and Parses data from OMDb API and presents data as part of a class
 import requests
-
-def imdb_type(t):
-    if t == 'tv_series' or t == 'tv_episode' or t == 'video_game':
-        return t.replace('tv_', '').replace('video_', '')
-    elif t == 'feature':
-        return 'movie'
-    elif t == 'short':
-        return t
-    else:
-        return 'unknown'
-
-def arrJoin(arr, ver=None, out=''):
-    for i in range(0,len(arr)):
-        if i == (len(arr) - 1):
-            if ver == 'w':
-                out += arr[i]['name']['name'].replace('&','').strip() + ' ' + arr[i]['attr'].replace('&','').strip()
-            else:
-                out += arr[i]['name']['name'].replace('&','').strip()
-        else:
-            if ver == 'w':
-                out += arr[i]['name']['name'].replace('&','').strip() + ' ' + arr[i]['attr'].replace('&','').strip() + ', '
-            else:
-                out += arr[i]['name']['name'].replace('&','').strip() + ', '
-    return out.replace(' and,',',').replace('...','').replace('"','&quot;').replace("'","&#39;")
+import settings
 
 class IMDbAPI:
     def __init__(self, imdbID):
-        self.url = 'https://app.imdb.com/title/maindetails?tconst=' + imdbID
+        self.imdbID = imdbID
+        self.url = settings.baseURL + '&i=' + imdbID + '&plot=full'
         self.r = requests.get(self.url, headers={ 'User-Agent': 'IMDb Flask Website v' + str(0.1) })
-        self.data = self.r.json()['data']
+        self.data = self.r.json()
         
+        self.title = self.data['Title'].replace("'", '&#39;')
+        self.year = self.data['Year']
+        self.released = self.data['Released']
+        self.rated = self.data['Rated']
         
-        self.title = self.data['title'].replace('"','&quot;').replace("'","&#39;")
-        self.year = self.year()
-        self.released = self.released()
-        self.rated = self.data['certificate']['certificate'] if 'certificate' in self.data else 'N/A'
-        self.genres = ', '.join(self.data['genres']) if 'genres' in self.data and len(self.data['genres']) > 0 else 'N/A'
-        self.actors = arrJoin(self.data['cast_summary']) if 'cast_summary' in self.data else 'N/A'
-        self.writers = arrJoin(self.data['writers_summary'], 'w') if 'writers_summary' in self.data else 'N/A'
-        self.directors = arrJoin(self.data['directors_summary']) if 'directors_summary' in self.data else 'N/A'
-        self.plot = self.plot()
-        self.type = imdb_type(self.data['type'])
-        self.rating = str(self.data['rating']) if 'rating' in self.data else 'N/A'
-        self.numVotes = str("{:,}".format(int(self.data['num_votes']))) if 'num_votes' in self.data else 'N/A'
-        self.poster = self.data['image']['url'].replace('http://','https://') if 'image' in self.data else 'N/A'
-    
-    def year(self):
-        year = self.data['year']
-        if year == '????':
-            year = 'N/A'
-            
-        if imdb_type(self.data['type']) == 'series':
-            if 'year' in self.data and 'year_end' in self.data:
-                if self.data['year'] == self.data['year_end']:
-                    year = year
-                elif self.data['year_end'] == '????':
-                    year += '-'
-                elif self.data['year_end'] != '????':
-                    year = str(self.data['year']) + '-' + str(self.data['year_end'])
-            else:
-                year = 'N/A'
-        return year
-    
-    def released(self):
-        released = ''
-        if imdb_type(self.data['type']) != 'series':
-            try:
-                d = str(self.data['release_date']['normal'])
-                released = d[8:] + ' ' + m[int(d[5:7]) - 1] + ' ' + d[:4]
-                
-                if self.year == 'N/A':
-                    self.year = released[-4:]
-            except:
-                released = 'N/A'
-            
-        if imdb_type(self.data['type']) == 'series':
-            released = self.year[:4]
-    
-        if self.year == 'N/A' and released != 'N/A' and imdb_type(self.data['type']) != 'series':
-            self.year = released[-4:]
-                
-        if self.year != 'N/A' and released == 'N/A' and imdb_type(self.data['type']) != 'series':
-            released = self.year[:4]
+        self.genre = self.data['Genre']
+        self.actors = self.data['Actors'].replace("'", '&#39;')
+        self.writers = self.data['Writer'].replace('"', '&quot;').replace('...', '')
+        self.directors = self.data['Director'].replace('"', '&quot;')
         
-        return released
+        self.plot = self.data['Plot'].replace("'", '&#39;').replace('"', '&quot;')
+        self.Type = self.data['Type']
+        self.rating = self.data['imdbRating']
+        self.numVotes = self.data['imdbVotes']
+        self.poster = self.data['Poster'].replace("http://", "https://")
     
-    def plot(self):
-        if 'best_plot' in self.data:
-            if 'summary' in self.data['best_plot']:
-                plot = self.data['best_plot']['summary']
-            elif 'outline' in self.data['best_plot']:
-                plot = self.data['best_plot']['outline']
-        elif 'plot' in self.data:
-            plot = self.data['plot']['outline']
-        else:
-            plot = 'N/A'
-            
-        return plot.replace('"','&quot;').replace("'","&#39;")
-
-x = IMDbAPI('tt2379308')
-print(x.title)
-print(x.year)
+    def getJSON(self):
+        return '{"Title":"%s","Year":"%s","Released":"%s","Rated":"%s","Actors":"%s","Directors":"%s","Writers":"%s","Genres":"%s","Plot":"%s","Rating":"%s","Votes":"%s","Type":"%s","imdbID":"%s","Poster":"%s"}' % (self.title, self.year, self.released, self.rated, self.actors, self.directors, self.writers, self.genre, self.plot, self.rating, self.numVotes, self.Type, self.imdbID, self.poster)
+    
+    def getSQL(self):
+        insert = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','" % (self.imdbID, self.title, self.year, self.released, self.rated, self.genre, self.actors, self.directors, self.writers, self.plot, self.rating, self.numVotes, self.Type, self.poster)
+        
+        insert = insert.replace('û','&ucirc;').replace('Ô','&Ocirc;').replace('ô','&ocirc;').replace('é','&eacute;').replace('î','&icirc;')
+        insert = insert.replace('â','&acirc;').replace('ü','&uuml;').replace('ä','&auml;').replace('è','&egrave;').replace('ñ','&ntilde;').replace('-','-')
+        insert = insert.replace('·','&middot;').replace('ĂŠ','&eacute;').replace('Ă´','&ocirc;').replace('Ã´','&ocirc;').replace('Ăť','&ocirc;')
+        insert = insert.replace('Ă','&Ocirc;').replace('Ă','').replace('รป','&ucirc;').replace('','&Eacute;').replace('É','&Eacute;')
+        insert = insert.replace('Ž','&icirc;')
+        
+        return insert

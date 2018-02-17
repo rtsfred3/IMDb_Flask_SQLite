@@ -15,7 +15,7 @@ class imdb:
         self.imdbID = imdbID
         self.conn = conn
     
-    #Searches the main table (imdb) for the imdbID and returns false if it is there and true if it is not there.
+    #Searches the main table (imdb) for the imdbID and returns false if it is there and true if it is not there
     def search(self, c):
         c.execute("SELECT imdbID FROM imdb")
         for row in c:
@@ -40,15 +40,16 @@ class imdb:
     def add_row(self):
         c = self.conn.cursor()
         if self.search(c):
-            self.fromIMDb()
-            c.execute("INSERT INTO imdb VALUES (" + self.insert + str(int(time.time())) + "')")
+            #self.fromIMDb()
+            imdbInfo = imdbAPI.IMDbAPI(self.imdbID)
+            c.execute("INSERT INTO imdb VALUES (" + imdbInfo.getSQL() + str(int(time.time())) + "')")
             self.conn.commit()
         elif self.search(c) == False:
             c.execute("SELECT * FROM imdb WHERE imdbID='" + self.imdbID + "'")
             for row in c:
                 if (time.time() - float(row[14]))/86400 > settings.dbAge:
-                    data = json.loads(self.fromIMDb())
-                    c.execute("UPDATE imdb SET rating='" + data['Rating'] + "', votes='" + data['Votes'] + "', time='" + str(int(time.time())) + "' WHERE imdbID='" + self.imdbID + "'")
+                    imdbInfo = imdbAPI.IMDbAPI(self.imdbID)
+                    c.execute("UPDATE imdb SET rating='" + imdbInfo.rating + "', votes='" + imdbInfo.numVotes + "', time='" + str(int(time.time())) + "' WHERE imdbID='" + self.imdbID + "'")
                     self.conn.commit()
     
     #Returns the poster of imdbID from the database to be displayed to the visitor.
@@ -82,7 +83,8 @@ class imdb:
                 if row[12] == 'series':
                     media = 'TV'
                 
-                head = '<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>' + row[1] + ' (' + row[2] + ')</title>\n\t\t' + css + '\n\t</head>\n\t<body>'
+                ident = "<!--%s-->\n" % row[0]
+                head = ident + '<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>' + row[1] + ' (' + row[2] + ')</title>\n\t\t' + css + '\n\t</head>\n\t<body>'
                 main = '\n\t\t<div id="w" class="clearfix">\n\t\t\t<img src="../img/%s/" width="225px" class="floatright">\n\t\t\t<h2>%s</h2>\n\t\t\t<p class="genre">%s | %s | %s | %s |  %s based on %s votes</p>\n\t\t\t<p>%s</p>\n\t\t\t<p><a href="http://imdb.com/title/%s/" target=\"_blank\">View on IMDb &rarr;</a></p>\n\t\t</div>' % (row[0],row[1], media, row[2], row[4], row[5], str(row[10]), str(row[11]), row[9], row[0])
                 break
         

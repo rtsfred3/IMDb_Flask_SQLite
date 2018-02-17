@@ -1,15 +1,17 @@
-apiKey = ""                                     #OMDb API's Key
+apiKey = ""                                             #OMDb API's Key
 baseURL = "http://www.omdbapi.com/?apikey=" + apiKey    #OMDb Base URL
 
-db_file = '../imdb.db' #Name & Location of SQLite3 file
+db_file = '../imdb.db'  #Name & Location of SQLite3 file
 
 cacheDir = "static"             #Location of pregenerated HTML & JSON files
 HTMLDir = cacheDir+"/HTML/"     #Location of pregenerated HTML files 
 JSONDir = cacheDir+"/JSON/"     #Location of pregenerated JSON files
-templateDir = "templates"        #Location of template HTML file(s)
+templateDir = "templates"       #Location of template HTML file(s)
 
-dbAge = 7   #Data in database will get update every 7 days
-fileAge = 3 #HTML files will get update 3 days
+dbAge = 7               #Data in database will get update every 7 days
+fileAge = 3             #HTML files will get update 3 days
+dayLength = 24*60*60    #Length of a day (86400 seconds)
+dictAge = 15
 
 #Error
 errors = '<center>The location you are looking for is not here, please try again.</center>'

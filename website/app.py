@@ -28,15 +28,8 @@ def JSON(imdbID='tt1839578'):
     
     x = imdb(imdbID, conn)
     x.add_row()
-    jsoon = x.imdb_json()
     
-    f = open(filename, "w")
-    f.write(jsoon)
-    f.close()        
-    
-    conn.close()    
-    
-    resp = Response(jsoon, mimetype='application/json')
+    resp = Response(x.imdb_json(), mimetype='application/json')
     #resp.headers['Access-Control-Allow-Origin'] = '*'
     
     return resp

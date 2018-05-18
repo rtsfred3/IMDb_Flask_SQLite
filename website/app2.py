@@ -25,8 +25,6 @@ def JSON(imdbID='tt1839578'):
     getDict.appendToDict(imdbID, imdbDict)
     
     resp = Response(imdbDict[imdbID]['json'], mimetype='application/json')
-    #resp.headers['Access-Control-Allow-Origin'] = '*'
-    
     return resp
 
 @app.route('/img/')
@@ -42,6 +40,10 @@ def img(imdbID=None):
 @app.route('/favicon.ico')
 def favicon():
     return errors, 500
+
+@app.route('/hello')
+def E451():
+    return "<html><head><title>Unavailable For Legal Reasons</title></head><body><h1>Unavailable For Legal Reasons</h1><p>This request may not be serviced in the Roman Province of Judea due to the Lex Julia Majestatis, which disallows access to resources hosted on servers deemed to be operated by the People's Front of Judea.</p></body></html>", 451
 
 @app.errorhandler(404)
 @app.errorhandler(500)

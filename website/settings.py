@@ -1,4 +1,4 @@
-apiKey = ""                                             #OMDb API's Key
+apiKey = ""                                     #OMDb API's Key
 baseURL = "http://www.omdbapi.com/?apikey=" + apiKey    #OMDb Base URL
 
 db_file = '../imdb.db'  #Name & Location of SQLite3 file

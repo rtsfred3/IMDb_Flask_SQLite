@@ -23,6 +23,7 @@ def IMDb(imdbID='tt1839578'):
 
 @app.route('/json/')
 @app.route('/json/<imdbID>/')
+@app.route('/json/<imdbID>.json')
 def JSON(imdbID='tt1839578'):
     conn = sqlite3.connect(db_file)
     
@@ -30,7 +31,7 @@ def JSON(imdbID='tt1839578'):
     x.add_row()
     
     resp = Response(x.imdb_json(), mimetype='application/json')
-    #resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Origin'] = '*'
     
     return resp
 
@@ -50,7 +51,8 @@ def img(imdbID=None):
 
 @app.route('/favicon.ico')
 def favicon():
-    return errors, 500
+    req = requests.get("https://m.media-amazon.com/images/G/01/imdb/images/favicon-2165806970._CB499613556_.ico")
+    return Response(req, content_type=req.headers['content-type'])
 
 @app.errorhandler(404)
 @app.errorhandler(500)

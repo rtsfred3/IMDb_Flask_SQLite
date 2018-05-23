@@ -90,6 +90,13 @@ class imdb:
         
         return head + main + '\n\t</body>\n</html>'
     
+    def altHTML(self, head="", main=""):
+        global css
+        script = '<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script><script>$(document).ready(function(){$.get("/json/'+self.imdbID+'.json", function(res) { var s = " | "; var ratings = res.Rating +" based on "+res.Votes+" votes"; var type = res.Type=="series" ? "TV" : res.Type.charAt(0).toUpperCase() + res.Type.substr(1);$("title").html(res.Title + " (" + res.Year + ")"); $("#title").html(res.Title); $("#plot").html(res.Plot); $(".genre").html(type + s + res.Year + s + res.Rated + s + res.Genres + s + ratings); $("a").attr("href", "https://imdb.com/title/"+res.imdbID+"/"); $("img").attr("src", res.Poster.replace("https://", "http://")); }, "json"); });</script>'
+        
+        return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>IMDb</title>'+css+script+'</head><body><div id="w" class="clearfix"><img src="https://placehold.it/225x225" width="225px" class="floatright"><h2 id="title"></h2><p class="genre"></p><p id="plot"></p><p><a href="http://imdb.com/" target="_blank">View on IMDb &rarr;</a></p></div></body></html>'
+
+    
     #Provides a sitemap for the website
     def sitemap(self, url=None, main=''):
         c = self.conn.cursor()    

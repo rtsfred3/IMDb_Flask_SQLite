@@ -16,7 +16,7 @@ def IMDb(imdbID='tt1839578'):
     
     x = imdb(imdbID, conn)
     x.add_row()
-    html = x.html()
+    html = x.altHTML()
     
     conn.close()
     return html
@@ -30,10 +30,12 @@ def JSON(imdbID='tt1839578'):
     x = imdb(imdbID, conn)
     x.add_row()
     
-    resp = Response(x.imdb_json(), mimetype='application/json')
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    req = Response(x.imdb_json(), mimetype='application/json')
+    req.headers['Access-Control-Allow-Origin'] = '*'
+    req.headers['Cache-Control'] = 'max-age=7200'
     
-    return resp
+    conn.close()
+    return req
 
 @app.route('/img/')
 @app.route('/img/<imdbID>/')

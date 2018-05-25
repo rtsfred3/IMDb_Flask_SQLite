@@ -1,5 +1,7 @@
-apiKey = ""                                     #OMDb API's Key
-baseURL = "http://www.omdbapi.com/?apikey=" + apiKey    #OMDb Base URL
+import os.path
+
+apiKey = open("apikey.txt").read() if os.path.isfile("apikey.txt") else ""  #OMDb API's Key
+baseURL = "http://www.omdbapi.com/?apikey=" + apiKey                        #OMDb Base URL
 
 db_file = '../imdb.db'  #Name & Location of SQLite3 file
 
@@ -22,3 +24,7 @@ css = "html, body, div, span, h1, h2, p, pre, a, em, img, q, s, samp, small, str
 
 #render_template(app.html, title=data['Title'], year=data['Year'], poster="/img/"+imdbID+"/", series=data['Type'], rated=data['Rated'], rating=data['Rating'], votes=data['Votes'], plot=data['Plot'], imdbLink="http://imdb.com/title/"+imdbID+"/")
 templateHTML = "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>{{title}} ({{year}})</title>\n\t\t<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='app.css') }}\">\n\t</head>\n\t<body>\n\t\t<div id=\"w\" class=\"clearfix\">\n\t\t\t<img src=\"{{poster}}\" width=\"225px\" class=\"floatright\">\n\t\t\t<h2>{{title}}</h2>\n\t\t\t<p class=\"genre\">{{series}} | {{year}} | {{rated}} | {{genre}} |  {{rating}} based on {{votes}} votes</p>\n\t\t\t<p>{{plot}}</p>\n\t\t\t<p><a href=\"{{imdbLink}}\" target=\"_blank\">View on IMDb &rarr;</a></p>\n\t\t</div>\n\t</body>\n</html>"
+
+script = '<script>$(document).ready(function(){$("img").hide(),$.get("/json/{{imdbID}}.json",function(t){var e=" | ",s=t.Rating+" based on "+t.Votes+" votes",i="N/A"!==t.Poster?t.Poster:"#",o="series"==t.Type?"TV":t.Type.charAt(0).toUpperCase()+t.Type.substr(1);$("title").html(t.Title+" ("+t.Year+")"),$("#title").html(t.Title),$("#plot").html(t.Plot),$(".genre").html(o+e+t.Year+e+t.Rated+e+t.Genres+e+s),$("a").attr("href","https://imdb.com/title/"+t.imdbID+"/"),$("img").attr("src",i),"N/A"!==i&&$("img").show()},"json")});</script>'
+
+templateAltHTML = '<!DOCTYPE html>\n<html>\n\t\t<head>\n\t\t<meta charset="utf-8">\n\t\t<title>IMDb</title>\n\t\t<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'app.css\') }}">\n\t\t<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>\n\t\t'+script+'\n\t</head>\n\t<body>\n\t\t<div id="w" class="clearfix">\n\t\t\t<img src="#" width="225px" class="floatright">\n\t\t\t<h2 id="title"></h2>\n\t\t\t<p class="genre"></p>\n\t\t\t<p id="plot"></p>\n\t\t\t<p><a href="http://imdb.com/" target="_blank">View on IMDb &rarr;</a></p>\n\t\t</div>\n\t</body>\n</html>'

@@ -21,10 +21,16 @@ def generateStatic(html=True, json=True):
     f.write(css)
     f.close()    
 
-def generateTemplates():
+def generateTemplates(app=False, query=False):
     if os.path.exists(templateDir): shutil.rmtree(templateDir)
     if not os.path.exists(templateDir): os.makedirs(templateDir)
     
-    f = open(templateDir+"/app.html", "w")
-    f.write(templateHTML)
-    f.close()
+    if app:
+        f = open(templateDir+"/app.html", "w")
+        f.write(templateHTML)
+        f.close()
+    
+    if query:
+        f = open(templateDir+"/jquery.html", "w")
+        f.write(templateAltHTML)
+        f.close()

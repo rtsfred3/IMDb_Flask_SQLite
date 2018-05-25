@@ -12,14 +12,14 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/<imdbID>/')
 def IMDb(imdbID='tt1839578'):
-    conn = sqlite3.connect(db_file)
+    '''conn = sqlite3.connect(db_file)
     
     x = imdb(imdbID, conn)
     x.add_row()
     html = x.altHTML()
     
-    conn.close()
-    return html
+    conn.close()'''
+    return render_template('jquery.html', imdbID=imdbID)
 
 @app.route('/json/')
 @app.route('/json/<imdbID>/')
@@ -72,7 +72,7 @@ def main():
     conn.close()
     
     generateStatic(False, False)
-    #generateTemplates()
+    generateTemplates(query=True)
     
     return app.run('0.0.0.0')
 

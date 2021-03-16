@@ -25,6 +25,28 @@ css = "html, body, div, span, h1, h2, p, pre, a, em, img, q, s, samp, small, str
 #render_template(app.html, title=data['Title'], year=data['Year'], poster="/img/"+imdbID+"/", series=data['Type'], rated=data['Rated'], rating=data['Rating'], votes=data['Votes'], plot=data['Plot'], imdbLink="http://imdb.com/title/"+imdbID+"/")
 templateHTML = "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>{{title}} ({{year}})</title>\n\t\t<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='app.css') }}\">\n\t</head>\n\t<body>\n\t\t<div id=\"w\" class=\"clearfix\">\n\t\t\t<img src=\"{{poster}}\" width=\"225px\" class=\"floatright\">\n\t\t\t<h2>{{title}}</h2>\n\t\t\t<p class=\"genre\">{{series}} | {{year}} | {{rated}} | {{genre}} |  {{rating}} based on {{votes}} votes</p>\n\t\t\t<p>{{plot}}</p>\n\t\t\t<p><a href=\"{{imdbLink}}\" target=\"_blank\">View on IMDb &rarr;</a></p>\n\t\t</div>\n\t</body>\n</html>"
 
-script = '<script>$(document).ready(function(){$("img").hide(),$.get("/json/{{imdbID}}.json",function(t){var e=" | ",s=t.Rating+" based on "+t.Votes+" votes",i="N/A"!==t.Poster?t.Poster:"#",o="series"==t.Type?"TV":t.Type.charAt(0).toUpperCase()+t.Type.substr(1);$("title").html(t.Title+" ("+t.Year+")"),$("#title").html(t.Title),$("#plot").html(t.Plot),$(".genre").html(o+e+t.Year+e+t.Rated+e+t.Genres+e+s),$("a").attr("href","https://imdb.com/title/"+t.imdbID+"/"),$("img").attr("src",i),"N/A"!==i&&$("img").show()},"json")});</script>'
+script = '''function updatePage(t){
+  var s = " | ";
+  var rating = t.Rating+" based on "+t.Votes+" votes";
+  var series = t.Type == "series" ? "TV" : t.Type.charAt(0).toUpperCase()+t.Type.substr(1);
 
-templateAltHTML = '<!DOCTYPE html>\n<html>\n\t\t<head>\n\t\t<meta charset="utf-8">\n\t\t<title>IMDb</title>\n\t\t<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'app.css\') }}">\n\t\t<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>\n\t\t'+script+'\n\t</head>\n\t<body>\n\t\t<div id="w" class="clearfix">\n\t\t\t<img src="#" width="225px" class="floatright">\n\t\t\t<h2 id="title"></h2>\n\t\t\t<p class="genre"></p>\n\t\t\t<p id="plot"></p>\n\t\t\t<p><a href="http://imdb.com/" target="_blank">View on IMDb &rarr;</a></p>\n\t\t</div>\n\t</body>\n</html>'
+  document.getElementById("headTitle").innerHTML = t.Title+" ("+t.Year+")";
+  document.getElementById("title").innerHTML = t.Title;
+  document.getElementById("plot").innerHTML = t.Plot;
+  document.getElementById("genres").innerHTML = series+s+t.Year+s+t.Rated+s+t.Genres+s+rating;
+  document.getElementById("link").href = "https://imdb.com/title/"+t.imdbID+"/";
+  if(t.Poster !== "N/A"){ document.getElementById("poster").innerHTML = '<img src="'+t.Poster+'" width="225px" class="floatright">'; }
+}
+
+function loadDoc(e){
+  var xhttp = new XMLHttpRequest;
+  xhttp.onreadystatechange=function(){
+    if(this.readyState == 4 && this.status == 200){
+      updatePage(JSON.parse(this.responseText))
+    }
+  };
+  xhttp.open("GET",e,!0);
+  xhttp.send();
+}'''
+
+templateAltHTML = '<!DOCTYPE html>\n<html>\n\t\t<head>\n\t\t<meta charset="utf-8">\n\t\t<title id="headTitle">IMDb</title>\n\t\t<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'app.css\') }}">\n\t\t<script src="{{ url_for(\'static\', filename=\'imdb.js\') }}"></script>\n\t</head>\n\t<body>\n\t\t<div id="w" class="clearfix">\n\t\t\t<div id="poster"></div>\n\t\t\t<h2 id="title"></h2>\n\t\t\t<p class="genre" id="genres"></p>\n\t\t\t<p id="plot"></p>\n\t\t\t<p><a id="link" href="http://imdb.com/" target="_blank">View on IMDb &rarr;</a></p>\n\t\t</div>\n\t\t<script>loadDoc("/json/{{imdbID}}.json");</script>\n\t</body>\n</html>'

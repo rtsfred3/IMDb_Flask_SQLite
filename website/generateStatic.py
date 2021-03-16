@@ -19,7 +19,11 @@ def generateStatic(html=True, json=True):
     
     f = open(cacheDir+"/app.css", "w")
     f.write(css)
-    f.close()    
+    f.close()
+    
+    f = open(cacheDir+"/imdb.js", "w")
+    f.write(script)
+    f.close()
 
 def generateTemplates(app=False, query=False):
     if os.path.exists(templateDir): shutil.rmtree(templateDir)
@@ -34,3 +38,9 @@ def generateTemplates(app=False, query=False):
         f = open(templateDir+"/jquery.html", "w")
         f.write(templateAltHTML)
         f.close()
+        
+        f = open(cacheDir+"/imdb.js", "w")
+        f.write(script)
+        f.close()
+
+generateTemplates(app=True)

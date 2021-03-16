@@ -1,0 +1,12 @@
+
+*.pyc
+
+imdb.db
+
+website/apikey.txt
+
+website/templates/jquery.html
+
+website/static/imdb.js
+
+website/static/app.css

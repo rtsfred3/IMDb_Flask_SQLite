@@ -1,7 +1,7 @@
 import os.path
 
-apiKey = open("apikey.txt").read() if os.path.isfile("apikey.txt") else ""  #OMDb API's Key
-baseURL = "http://www.omdbapi.com/?apikey=" + apiKey                        #OMDb Base URL
+apiKey = open("apikey.txt").read().strip() if os.path.isfile("apikey.txt") else ""  #OMDb API's Key
+baseURL = "https://www.omdbapi.com/?apikey=" + apiKey                        #OMDb Base URL
 
 db_file = '../imdb.db'  #Name & Location of SQLite3 file
 

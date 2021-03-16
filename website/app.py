@@ -69,6 +69,7 @@ def main():
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
     c.execute("CREATE TABLE IF NOT EXISTS imdb (imdbID, title, year, released, rated, genres, actors, directors, writers, plot, rating, votes, type, poster, time)")
+    c.execute("CREATE INDEX IF NOT EXISTS `imdb_id` ON `imdb` (`imdbID` ASC)")
     conn.close()
     
     generateStatic(False, False)

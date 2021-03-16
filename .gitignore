@@ -10,3 +10,5 @@ website/templates/jquery.html
 website/static/imdb.js
 
 website/static/app.css
+
+*.db

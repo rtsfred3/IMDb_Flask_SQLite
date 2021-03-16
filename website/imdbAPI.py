@@ -5,9 +5,11 @@ import settings
 class IMDbAPI:
     def __init__(self, imdbID):
         self.imdbID = imdbID
-        self.url = settings.baseURL + '&i=' + imdbID + '&plot=full'
+        self.url = settings.baseURL + '&i={}&plot=full'.format(imdbID)# + imdbID + '&plot=full'
         self.r = requests.get(self.url, headers={ 'User-Agent': 'IMDb Flask Website v' + str(0.1) })
         self.data = self.r.json()
+        
+        print(self.url)
         
         self.title = self.data['Title'].replace("'", '&#39;')
         self.year = self.data['Year']

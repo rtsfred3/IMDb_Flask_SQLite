@@ -42,14 +42,22 @@ class imdb:
         if self.search(c):
             #self.fromIMDb()
             imdbInfo = imdbAPI.IMDbAPI(self.imdbID)
-            c.execute("INSERT INTO imdb VALUES (" + imdbInfo.getSQL() + str(int(time.time())) + "')")
+            c.execute("INSERT INTO imdb (`imdbID`, `title`, `year`, `released`, `rated`, `genres`, `actors`, `directors`, `writers`, `plot`, `rating`, `votes`, `type`, `poster`, `time`) VALUES (" + imdbInfo.getSQL() + str(int(time.time())) + "')")
             self.conn.commit()
         elif self.search(c) == False:
             c.execute("SELECT * FROM imdb WHERE imdbID='" + self.imdbID + "'")
             for row in c:
                 if (time.time() - float(row[14]))/86400 > settings.dbAge:
                     imdbInfo = imdbAPI.IMDbAPI(self.imdbID)
-                    c.execute("UPDATE imdb SET rating='" + imdbInfo.rating + "', votes='" + imdbInfo.numVotes + "', time='" + str(int(time.time())) + "' WHERE imdbID='" + self.imdbID + "'")
+                    print(imdbInfo.rating, imdbInfo.numVotes, self.imdbID)
+                    
+                    temp = "UPDATE imdb SET rating='{}', votes='{}', time={} WHERE imdbID='{}'".format(imdbInfo.rating, imdbInfo.numVotes, str(int(time.time())), self.imdbID)
+                    
+                    print(temp)
+                    c.execute(temp)
+                    
+                    #c.execute("UPDATE imdb SET rating='" + imdbInfo.rating + "', votes='" + imdbInfo.numVotes + "', time='" + str(int(time.time())) + "' WHERE imdbID='" + self.imdbID + "'")
+                    
                     self.conn.commit()
     
     #Returns the poster of imdbID from the database to be displayed to the visitor.
@@ -117,6 +125,11 @@ class imdb:
         imdbInfo = imdbAPI.IMDbAPI(self.imdbID)
         self.insert = imdbInfo.getSQL()
         return imdbInfo.getJSON()
+    
+    def put(self, acceptedJSON={}):
+        if not ('imdbID' in acceptedJSON):
+            return
+        return
 
 def test(imdbID="tt1839578"):
     conn = sqlite3.connect('imdb.db')

@@ -30,6 +30,26 @@ class IMDbAPI:
     def getJSON(self):
         return '{"Title":"%s","Year":"%s","Released":"%s","Rated":"%s","Actors":"%s","Directors":"%s","Writers":"%s","Genres":"%s","Plot":"%s","Rating":"%s","Votes":"%s","Type":"%s","imdbID":"%s","Poster":"%s"}' % (self.title, self.year, self.released, self.rated, self.actors, self.directors, self.writers, self.genre, self.plot, self.rating, self.numVotes, self.Type, self.imdbID, self.poster)
     
+    def getDetailedJSON(self):
+        #return '{"Title":"%s","Year":"%s","Released":"%s","Rated":"%s","Actors":"%s","Directors":"%s","Writers":"%s","Genres":"%s","Plot":"%s","Rating":"%s","Votes":"%s","Type":"%s","imdbID":"%s","Poster":"%s"}' % (self.title, self.year, self.released, self.rated, self.actors, self.directors, self.writers, self.genre, self.plot, self.rating, self.numVotes, self.Type, self.imdbID, self.poster)
+        
+        return {
+            "Title": self.title,
+            "Year": self.year,
+            "Released": self.released,
+            "Rated": self.rated,
+            "Actors": [person.strip() for person in self.actors.split(',')] if self.actors != 'N/A' else [],
+            "Directors": [person.strip() for person in self.directors.split(',')] if self.directors != 'N/A' else [],
+            "Writers": [person.strip() for person in self.writers.split(',')] if self.writers != 'N/A' else [],
+            "Genres": "%s",
+            "Plot": self.plot,
+            "Rating": self.rating,
+            "Votes": self.numVotes,
+            "Type": self.Type,
+            "imdbID": self.imdbID,
+            "Poster": self.poster
+        }
+    
     def getSQL(self):
         insert = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','" % (self.imdbID, self.title, self.year, self.released, self.rated, self.genre, self.actors, self.directors, self.writers, self.plot, self.rating, self.numVotes, self.Type, self.poster)
         
@@ -40,3 +60,10 @@ class IMDbAPI:
         insert = insert.replace('Ž','&icirc;')
         
         return insert
+
+def test():
+    api = IMDbAPI('tt1839578')
+    print(api.getDetailedJSON())
+
+if __name__ == '__main__':
+    test()

@@ -53,7 +53,7 @@ def page_not_found(e):
 def main():
     if apiKey == "":
         print("Missing API Key")
-        return 0    
+        return 0
     
     generateStatic(False, False)
     return app.run('0.0.0.0')
